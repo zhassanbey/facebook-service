@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>kz.alem.semantics.facebook.service</groupId>
+    <artifactId>FacebookClient</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+     
+    <build>
+        
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        
+        <plugins>
+           
+            <plugin>
+                    
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>*.yaml</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>kz.alem.semantics.crawler.storm.Crawler</mainClass>
+                               
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.handlers</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.schemas</resource>
+                                </transformer>
+                            </transformers>
+                            
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                    
+                            <shadedClassifierName>executable</shadedClassifierName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin> 
+           
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId> 
+                <configuration> 
+                    <argLine>-XX:-UseSplitVerifier</argLine> 
+                </configuration> 
+                <version>2.18.1</version>
+            </plugin>        
+        </plugins>
+    </build>
+
+    
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+
+                <jdbc.url>jdbc:postgresql://postgresql:5432/semantics3</jdbc.url>
+                <jdbc.username>postgres</jdbc.username>
+                <jdbc.password>1234567890</jdbc.password>
+                
+                <hibernate.dbcp.maxActive>15</hibernate.dbcp.maxActive>
+                <hibernate.dbcp.maxIdle>10</hibernate.dbcp.maxIdle>
+
+                <sqs.access.key>AKIAJTTXGA2RRP6ZMRKQ</sqs.access.key>
+                <sqs.access.secret.key>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</sqs.access.secret.key>
+                <sqs.pages.queue.url>https://sqs.eu-west-1.amazonaws.com/436101223472/pages_dev</sqs.pages.queue.url>
+                
+                <solr.archive.server.address>http://solrserver:8984/solr/archive/</solr.archive.server.address>
+                <solr.client.server.address>http://solrserver:8984/solr/client/</solr.client.server.address>
+            
+                <orientdb.dburl>remote:orientdb/linkdb</orientdb.dburl>
+                <orientdb.username>admin</orientdb.username>
+                <orientdb.password>admin</orientdb.password>
+
+                <links.rest.url>http://52.18.29.33:6092</links.rest.url>
+                <facebook.service.url>http://52.19.225.136:8092</facebook.service.url>
+                                
+            </properties>
+        </profile>
+        <profile>
+            <id>production</id>
+            
+            <properties>
+
+                <jdbc.url>jdbc:postgresql://postgresql:5432/semantics3</jdbc.url>
+                <jdbc.username>postgres</jdbc.username>
+                <jdbc.password>1234567890</jdbc.password>
+                
+                <hibernate.dbcp.maxActive>15</hibernate.dbcp.maxActive>
+                <hibernate.dbcp.maxIdle>10</hibernate.dbcp.maxIdle>
+
+                <sqs.access.key>AKIAJTTXGA2RRP6ZMRKQ</sqs.access.key>
+                <sqs.access.secret.key>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</sqs.access.secret.key>
+                <sqs.pages.queue.url>https://sqs.eu-west-1.amazonaws.com/436101223472/pages_dev</sqs.pages.queue.url>
+                
+                <solr.archive.server.address>http://solrserver:8984/solr/archive/</solr.archive.server.address>
+                <solr.client.server.address>http://solrserver:8984/solr/client/</solr.client.server.address>
+            
+                <orientdb.dburl>remote:orientdb/linkdb</orientdb.dburl>
+                <orientdb.username>admin</orientdb.username>
+                <orientdb.password>admin</orientdb.password>
+
+                <links.rest.url>http://52.18.29.33:7092</links.rest.url>
+                <facebook.service.url>http://172.31.29.198:8092</facebook.service.url>
+                                
+            </properties>
+        </profile>
+        
+        
+      
+        
+        <profile>
+            <id>optimization</id>
+           
+            <properties>
+
+                <jdbc.url>jdbc:postgresql://devmonitoring:5432/semantics3</jdbc.url>
+                <jdbc.username>postgres</jdbc.username>
+                <jdbc.password>1234567890</jdbc.password>
+
+                <hibernate.dbcp.maxActive>15</hibernate.dbcp.maxActive>
+                <hibernate.dbcp.maxIdle>0</hibernate.dbcp.maxIdle>
+
+                <sqs.access.key>AKIAJTTXGA2RRP6ZMRKQ</sqs.access.key>
+                <sqs.access.secret.key>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</sqs.access.secret.key>
+                <sqs.pages.queue.url>https://sqs.eu-west-1.amazonaws.com/436101223472/pages_dev</sqs.pages.queue.url>
+                
+                <solr.archive.server.address>http://solrservertest:8984/solr/archive/</solr.archive.server.address>
+                <solr.client.server.address>http://solrservertest:8984/solr/client/</solr.client.server.address>
+            
+                <orientdb.dburl>remote:orientdb/linkdb</orientdb.dburl>
+                <orientdb.username>admin</orientdb.username>
+                <orientdb.password>admin</orientdb.password>
+
+                <links.rest.url>http://52.18.29.33:6092</links.rest.url>
+                <facebook.service.url>http://52.19.225.136:8092</facebook.service.url>
+                                
+            </properties>
+        </profile>
+        
+        <profile>
+            <id>test</id>
+
+            <properties>
+
+                <jdbc.url>jdbc:postgresql://postgresqltest:5432/semantics3</jdbc.url>
+                <jdbc.username>postgres</jdbc.username>
+                <jdbc.password>1234567890</jdbc.password>
+
+                <hibernate.dbcp.maxActive>1</hibernate.dbcp.maxActive>
+                <hibernate.dbcp.maxIdle>0</hibernate.dbcp.maxIdle>
+
+                <sqs.access.key>AKIAJTTXGA2RRP6ZMRKQ</sqs.access.key>
+                <sqs.access.secret.key>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</sqs.access.secret.key>
+                <sqs.pages.queue.url>https://sqs.eu-west-1.amazonaws.com/436101223472/pages_test</sqs.pages.queue.url>
+                
+                <solr.archive.server.address>http://solrservertest:8984/solr/archive/</solr.archive.server.address>
+                <solr.client.server.address>http://solrservertest:8984/solr/client/</solr.client.server.address>
+            
+                <orientdb.dburl>remote:devorientdb/linkdb</orientdb.dburl>
+                <orientdb.username>admin</orientdb.username>
+                <orientdb.password>admin</orientdb.password>
+                
+                <links.rest.url>http://52.18.29.33:6092</links.rest.url>
+                <facebook.service.url>http://172.31.29.198:8092</facebook.service.url>
+                
+            </properties>
+            
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>2.18.1</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        
+        </profile>
+    </profiles>
+    <dependencies>
+        
+         <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.2.3</version>
+            <type>jar</type>
+        </dependency>
+       
+        <dependency>
+            <groupId>kz.alem.semantics</groupId>    
+            <artifactId>parse-util</artifactId>
+            <version>0.1</version> 
+            
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20090211</version>
+            <type>jar</type>
+        </dependency>
+
+    <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <!-- Transaction -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+    </dependencies>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <spring.version>4.1.6.RELEASE</spring.version>
+    </properties>
+    
+    
+    
+</project>

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>kz.alem.semantics.facebook.service</groupId>
+    <artifactId>leaderank</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <spring.version>4.1.6.RELEASE</spring.version>
+    </properties>
+    <build> 
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+           
+            <plugin>
+                    
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>*.yaml</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>kz.alem.semantics.facebook.service.leaderank.DynamicLeaderRank</mainClass>
+                               
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.handlers</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.schemas</resource>
+                                </transformer>
+                            </transformers>
+                            
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                    
+                            <shadedClassifierName>executable</shadedClassifierName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin> 
+            
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId> 
+                <configuration> 
+                    <argLine>-XX:-UseSplitVerifier</argLine> 
+                </configuration> 
+                <version>2.18.1</version>
+            </plugin>        
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+
+                <jdbc.url>jdbc:postgresql://devmonitoring:5432/semantics3</jdbc.url>
+                <jdbc.username>postgres</jdbc.username>
+                <jdbc.password>1234567890</jdbc.password>
+                
+                <hibernate.dbcp.maxActive>15</hibernate.dbcp.maxActive>
+                <hibernate.dbcp.maxIdle>10</hibernate.dbcp.maxIdle>
+
+                <facebook.service.url>http://localhost:8092</facebook.service.url>
+                <rabbit.mq.host>54.72.168.234</rabbit.mq.host>
+                <leaderank.db.server>devmonitoring</leaderank.db.server>
+            </properties>
+        </profile>
+        <profile>
+            <id>production</id>
+            
+            <properties>
+
+                <jdbc.url>jdbc:postgresql://postgresql:5432/semantics3</jdbc.url>
+                <jdbc.username>postgres</jdbc.username>
+                <jdbc.password>1234567890</jdbc.password>
+                
+                <hibernate.dbcp.maxActive>15</hibernate.dbcp.maxActive>
+                <hibernate.dbcp.maxIdle>10</hibernate.dbcp.maxIdle>
+
+                <facebook.service.url>http://54.154.60.220:8092</facebook.service.url>
+                <rabbit.mq.host>54.72.168.234</rabbit.mq.host>
+                <leaderank.db.server>postgresql</leaderank.db.server>
+            </properties>
+        </profile>
+        
+        <profile>
+            <id>test</id>
+
+            <properties>
+
+                <jdbc.url>jdbc:postgresql://postgresql:5432/semantics3</jdbc.url>
+                <jdbc.username>postgres</jdbc.username>
+                <jdbc.password>1234567890</jdbc.password>
+
+                <hibernate.dbcp.maxActive>1</hibernate.dbcp.maxActive>
+                <hibernate.dbcp.maxIdle>0</hibernate.dbcp.maxIdle>
+
+                <facebook.service.url>http://54.154.60.220:8092</facebook.service.url>
+                <rabbit.mq.host>172.31.24.98</rabbit.mq.host>
+                <leaderank.db.server>postgresqltest</leaderank.db.server>
+            </properties>
+            
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>2.18.1</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        
+        </profile>
+        
+    </profiles>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>kz.alem.semantics.facebook.service</groupId>
+            <artifactId>FacebookClient</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.4</version>
+            <type>jar</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <type>jar</type>
+        </dependency>
+        
+        
+        <dependency>
+            <groupId>kz.alem.semantics</groupId>
+            <artifactId>linkdb-sqlorm</artifactId>
+            <version>0.1.3</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>kz.alem.semantics.leaderank</groupId>
+            <artifactId>leaderank-orm</artifactId>
+            <version>0.1.40</version>
+        </dependency>
+       
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>3.5.6</version>
+        </dependency>
+    </dependencies>
+    <name>AccountRankService</name>
+</project>

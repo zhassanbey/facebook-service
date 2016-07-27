@@ -1,0 +1,1 @@
+select * from leaderank where rank>1000 and country='KZ' and  status = 0 order by rank desc 
